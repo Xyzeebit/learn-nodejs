@@ -6,16 +6,23 @@ try {
   const filename = process.argv[2];
   net
     .createServer((connection) => {
-      console.log("Subscriber connected");
-      console.log(`Now watching ${filename} for changes...\n`);
+        console.log("Subscriber connected");
+        connection.write(
+          JSON.stringify({ type: "watching", file: filename }) + "\n"
+        );
 
       const watcher = fs.watch(filename, () =>
-        connection.write(`File changed: ${new Date()}\n`)
+        connection.write(
+          JSON.stringify({ type: "changed", timestamp: Date.now() }) + "\n"
+        )
       );
-
+      // error 
+        connection.on('error', err => {
+            console.log(err.message);
+        })
       // cleanup
       connection.on("close", () => {
-        console.log("Subsciber disconnected");
+        console.log("Subscriber disconnected");
         watcher.close();
       });
     })

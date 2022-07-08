@@ -1,5 +1,5 @@
 'use strict';
-import net from 'net';
+const net = require('net');
 const client = net.connect({ port: 60300 });
 client.on('data', data => {
     const message = JSON.parse(data);
