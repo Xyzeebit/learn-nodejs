@@ -12,10 +12,11 @@ describe('LDJClient', () => {
         client = new LDJClient(stream);
     });
 
-    it('should emit a message event from a single data source', () => {
+    it('should emit a message event from a single data source', (done) => {
         client.on('message', message => {
             assert.deepStrictEqual(message, { foo: 'bar' });
+            done();
         });
-        stream.emit('message', '{ "foo": "bar" }\n');
+        stream.emit('data', '{ "foo": "bar" }\n');
     });
 });
