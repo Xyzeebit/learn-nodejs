@@ -10,7 +10,7 @@ class LDJClient extends EventEmitter {
             let boundary = buffer.indexOf('\n');
             while (boundary !== -1) {
                 const input = buffer.substring(0, boundary);
-                const buffer = buffer.substring(boundary + 1);
+                buffer = buffer.substring(boundary + 1);
                 this.emit('message', JSON.parse(input));
                 boundary = buffer.indexOf('\n');
             }
@@ -21,4 +21,4 @@ class LDJClient extends EventEmitter {
     }
 }
 
-module.exports = LDClient;
+module.exports = LDJClient;
