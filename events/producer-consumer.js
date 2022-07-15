@@ -19,11 +19,7 @@ class Producer extends EventEmitter {
                 const value = String.fromCharCode(this.i++);
                 this.data.push(value);
                 
-                if (this.i % 2) {
-                    this.emit("produced", value);
-                } else {
-                    this.emit("produced another", value);
-                }
+                this.emit("produced", value);
             } else {
                 this.emit("end", this.timer);
             }
@@ -51,9 +47,8 @@ class Consumer extends EventEmitter {
 
 }
 
-const producer = new Producer(data, 250);
-const consumer = new Consumer(data, 1000);
-const anotherConsumer = new Consumer(data, 1000);
+const producer = new Producer(data, 1000);
+const consumer = new Consumer(data, 1500);
 
 producer
     .on('produced', value => {
@@ -61,15 +56,10 @@ producer
         consumer.consume();
         
     })
-    .on('produced another', value => {
-        console.log("Producer produced another:", value, "\r\n");
-        anotherConsumer.consume();
-    })
     .on('end', (timer) => {
         clearInterval(timer);
         console.log('Producer finished production');
         consumer.consume();
-        anotherConsumer.consume();
     });
 
 consumer
@@ -79,14 +69,5 @@ consumer
     .on('end', (timer) => {
         clearTimeout(timer)
         console.log('>>>>>>>>Consumer finished consumption');
-    });
-
-anotherConsumer
-    .on("consumed", (value) => {
-        console.log(">>>>>>>>><<<<<<<<<AnotherConsumer consumed:", value);
-    })
-    .on("end", (timer) => {
-        clearTimeout(timer);
-        console.log(">>>>>>>><<<<<<<<AnotherConsumer finished consumption");
     });
 
