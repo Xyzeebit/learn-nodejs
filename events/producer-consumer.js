@@ -5,11 +5,12 @@ const data = [];
 
 class Producer extends EventEmitter {
 
-    constructor(data) {
+    constructor(data, timeout) {
         super();
         // 90 - 65cap  97-122sma
         this.i = 65;
         this.data = data;
+        this.timeout = timeout;
         this.produce();
     }
     produce() {
@@ -17,19 +18,25 @@ class Producer extends EventEmitter {
             if (this.i < 91) {
                 const value = String.fromCharCode(this.i++);
                 this.data.push(value);
-                this.emit("produced", value);
+                
+                if (this.i % 2) {
+                    this.emit("produced", value);
+                } else {
+                    this.emit("produced another", value);
+                }
             } else {
                 this.emit("end", this.timer);
             }
-        }, 500);
+        }, this.timeout);
         
     }
 }
 
 class Consumer extends EventEmitter {
-    constructor(data) {
+    constructor(data, timeout) {
         super();
         this.data = data;
+        this.timeout = timeout;
     }
     consume() {
         this.timer = setTimeout(() => {
@@ -38,24 +45,31 @@ class Consumer extends EventEmitter {
             } else {
               this.emit("end", this.timer);
             }
-        }, 1000);
+        }, this.timeout);
         
     }
 
 }
 
-const producer = new Producer(data);
-const consumer = new Consumer(data);
+const producer = new Producer(data, 250);
+const consumer = new Consumer(data, 1000);
+const anotherConsumer = new Consumer(data, 1000);
 
 producer
     .on('produced', value => {
         console.log('Producer produced:', value, '\r\n');
         consumer.consume();
+        
+    })
+    .on('produced another', value => {
+        console.log("Producer produced another:", value, "\r\n");
+        anotherConsumer.consume();
     })
     .on('end', (timer) => {
         clearInterval(timer);
         console.log('Producer finished production');
         consumer.consume();
+        anotherConsumer.consume();
     });
 
 consumer
@@ -65,5 +79,14 @@ consumer
     .on('end', (timer) => {
         clearTimeout(timer)
         console.log('>>>>>>>>Consumer finished consumption');
+    });
+
+anotherConsumer
+    .on("consumed", (value) => {
+        console.log(">>>>>>>>><<<<<<<<<AnotherConsumer consumed:", value);
+    })
+    .on("end", (timer) => {
+        clearTimeout(timer);
+        console.log(">>>>>>>><<<<<<<<AnotherConsumer finished consumption");
     });
 
