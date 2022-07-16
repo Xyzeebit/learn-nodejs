@@ -1,6 +1,7 @@
 const net = require('net');
 const { fork } = require('child_process');
-const child = fork(__dirname + '/net-child.js');
+const path = require('path');
+const child = fork(path.join(__dirname + '/net-child.js'));
 
 const server = net.createServer();
 server.on('connection', socket => {
