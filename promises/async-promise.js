@@ -13,7 +13,20 @@ const { getUser, getProfile } = require('./api');
     try {
         const asyncProfile = await getProfile(true);
         console.log("async profile:", asyncProfile);
+
     } catch (error) {
         console.log(error.message);
     }
 })();
+
+(async (pass) => {
+    try {
+        const asyncUser = await getUser(pass);
+        console.log("async user:", asyncUser);
+
+        const asyncProfile = await getProfile();
+        console.log("async profile:", asyncProfile);
+    } catch (error) {
+        console.log(error.message);
+    }
+})(true);
