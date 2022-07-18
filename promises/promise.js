@@ -13,3 +13,14 @@ API.getProfile(true).then((user) => {
 }).catch((error) => {
     console.log(error.message);
 });
+
+Promise.all([
+    API.getUser(true),
+    API.getProfile(true)
+]).then(results => {
+    results.forEach(result => {
+        console.log(result)
+    })
+}).catch(error => {
+    console.log(error.message);
+});
